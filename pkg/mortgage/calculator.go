@@ -2,8 +2,8 @@ package mortgage
 
 import (
 	"errors"
+	"github.com/jhidalgoesp/bc-mortgage-calculator/pkg/validate"
 	"math"
-	"quoter/pkg/validate"
 	"strings"
 )
 
@@ -59,7 +59,7 @@ func (c Calculator) PaymentSchedule() (float64, error) {
 	paymentPerSchedule := principal * scheduleRate * (math.Pow(1+scheduleRate, float64(numberOfPayments))) /
 		(math.Pow(1+scheduleRate, float64(numberOfPayments)) - 1)
 
-	if c.Schedule == AcceleratedBiweekly {
+	if strings.ToUpper(c.Schedule) == AcceleratedBiweekly {
 		return math.Round(paymentPerSchedule*100) / 2 / 100, nil
 	}
 

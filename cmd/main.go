@@ -2,9 +2,9 @@ package main
 
 import (
 	"fmt"
+	"github.com/jhidalgoesp/bc-mortgage-calculator/pkg/web/handlers"
 	"log"
 	"net/http"
-	"quoter/pkg/web/handlers"
 )
 
 const port = 3000

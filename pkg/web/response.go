@@ -21,6 +21,7 @@ func Respond(w http.ResponseWriter, data any, statusCode int) {
 
 	// Set the content type and headers once we know marshaling has succeeded.
 	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Access-Control-Allow-Origin", "http://localhost:3001")
 
 	// Write the status code to the response.
 	w.WriteHeader(statusCode)

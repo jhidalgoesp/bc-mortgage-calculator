@@ -2,11 +2,11 @@ package handlers
 
 import (
 	"errors"
+	"github.com/jhidalgoesp/bc-mortgage-calculator/pkg/mortgage"
+	"github.com/jhidalgoesp/bc-mortgage-calculator/pkg/validate"
+	"github.com/jhidalgoesp/bc-mortgage-calculator/pkg/web"
 	"log"
 	"net/http"
-	"quoter/pkg/mortgage"
-	"quoter/pkg/validate"
-	"quoter/pkg/web"
 )
 
 type paymentScheduleResponse struct {
@@ -34,7 +34,14 @@ func PaymentScheduleHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if r.Method != "GET" {
+	if r.Method == "OPTIONS" {
+		w.Header().Set("Access-Control-Allow-Origin", "http://localhost:3001")
+		w.Header().Set("Access-Control-Allow-Headers", "content-type")
+		w.WriteHeader(http.StatusOK)
+		return
+	}
+
+	if r.Method != "POST" {
 		notFoundResponse(w)
 		return
 	}

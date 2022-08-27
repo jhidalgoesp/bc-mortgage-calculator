@@ -1,8 +1,8 @@
 package mortgage
 
 import (
-	"quoter/pkg/helpers"
-	"quoter/pkg/validate"
+	"github.com/jhidalgoesp/bc-mortgage-calculator/pkg/tests"
+	"github.com/jhidalgoesp/bc-mortgage-calculator/pkg/validate"
 	"testing"
 )
 
@@ -12,7 +12,7 @@ func TestValidateAmortizationPeriod(t *testing.T) {
 			AmortizationPeriod: 1,
 		}
 		got := c.validateAmortizationPeriod()
-		helpers.AssertEqualErrors(t, got, ErrPeriodNotAMultipleOfFive)
+		tests.AssertEqualErrors(t, got, ErrPeriodNotAMultipleOfFive)
 	})
 
 	t.Run("when the amortization period is between the maxium and minimum amortization period constants return true", func(t *testing.T) {
@@ -20,7 +20,7 @@ func TestValidateAmortizationPeriod(t *testing.T) {
 			AmortizationPeriod: 10,
 		}
 		got := c.validateAmortizationPeriod()
-		helpers.AssertNilError(t, got)
+		tests.AssertNilError(t, got)
 	})
 
 	t.Run("when the amortization period is equals to the maximumAmortizationPeriod constant return true", func(t *testing.T) {
@@ -28,7 +28,7 @@ func TestValidateAmortizationPeriod(t *testing.T) {
 			AmortizationPeriod: 30,
 		}
 		got := c.validateAmortizationPeriod()
-		helpers.AssertNilError(t, got)
+		tests.AssertNilError(t, got)
 	})
 
 	t.Run("when the amortization period is equals to the minimumAmortizationPeriod constant return false", func(t *testing.T) {
@@ -36,7 +36,7 @@ func TestValidateAmortizationPeriod(t *testing.T) {
 			AmortizationPeriod: 5,
 		}
 		got := c.validateAmortizationPeriod()
-		helpers.AssertNilError(t, got)
+		tests.AssertNilError(t, got)
 	})
 
 	t.Run("when the amortization period is lower than the minimumAmortizationPeriod constant return an out of range error", func(t *testing.T) {
@@ -44,7 +44,7 @@ func TestValidateAmortizationPeriod(t *testing.T) {
 			AmortizationPeriod: 0,
 		}
 		got := c.validateAmortizationPeriod()
-		helpers.AssertEqualErrors(t, got, ErrPeriodOutOfRange)
+		tests.AssertEqualErrors(t, got, ErrPeriodOutOfRange)
 	})
 
 	t.Run("when the amortization period is higher than the maximumAmortizationPeriod constant return an out of range error", func(t *testing.T) {
@@ -52,7 +52,7 @@ func TestValidateAmortizationPeriod(t *testing.T) {
 			AmortizationPeriod: 35,
 		}
 		got := c.validateAmortizationPeriod()
-		helpers.AssertEqualErrors(t, got, ErrPeriodOutOfRange)
+		tests.AssertEqualErrors(t, got, ErrPeriodOutOfRange)
 	})
 }
 
@@ -64,8 +64,8 @@ func TestCalculateCMHCRate(t *testing.T) {
 			DownPayment:   0,
 		}
 		got, err := c.calculateCMHCRate()
-		helpers.AssertSameFloat(t, got, 0.0)
-		helpers.AssertEqualErrors(t, err, ErrDownPaymentNotLargeEnough)
+		tests.AssertSameFloat(t, got, 0.0)
+		tests.AssertEqualErrors(t, err, ErrDownPaymentNotLargeEnough)
 	})
 
 	t.Run(`when the percentage of the down payment is equals to 5% return a 4% CMHC rate`, func(t *testing.T) {
@@ -199,8 +199,8 @@ func TestCalculateCMHC(t *testing.T) {
 
 		got, err := c.calculateCMHC()
 
-		helpers.AssertSameFloat(t, got, 0.0)
-		helpers.AssertEqualErrors(t, err, ErrDownPaymentNotLargeEnough)
+		tests.AssertSameFloat(t, got, 0.0)
+		tests.AssertEqualErrors(t, err, ErrDownPaymentNotLargeEnough)
 	})
 }
 
@@ -229,8 +229,8 @@ func TestCalculateTotalMortgage(t *testing.T) {
 			DownPayment:   1000,
 		}
 		got, err := c.calculateTotalMortgage()
-		helpers.AssertSameFloat(t, got, 0.0)
-		helpers.AssertEqualErrors(t, err, ErrDownPaymentNotLargeEnough)
+		tests.AssertSameFloat(t, got, 0.0)
+		tests.AssertEqualErrors(t, err, ErrDownPaymentNotLargeEnough)
 	})
 }
 
@@ -264,8 +264,8 @@ func TestPaymentsPerYear(t *testing.T) {
 			Schedule: "Yearly",
 		}
 		got, err := c.totalNumberOfPayments()
-		helpers.AssertEqualErrors(t, err, errInvalidSchedule)
-		helpers.AssertSameInt(t, got, 0)
+		tests.AssertEqualErrors(t, err, errInvalidSchedule)
+		tests.AssertSameInt(t, got, 0)
 	})
 }
 
@@ -303,8 +303,8 @@ func TestTotalNumberOfPayments(t *testing.T) {
 			AmortizationPeriod: 5,
 		}
 		got, err := c.totalNumberOfPayments()
-		helpers.AssertEqualErrors(t, err, errInvalidSchedule)
-		helpers.AssertSameInt(t, got, 0)
+		tests.AssertEqualErrors(t, err, errInvalidSchedule)
+		tests.AssertSameInt(t, got, 0)
 	})
 }
 
@@ -406,15 +406,15 @@ func TestPaymentSchedule(t *testing.T) {
 
 func AssertHandledScheduleErrors(t testing.TB, c *Calculator, wantedErr error) {
 	_, err := c.PaymentSchedule()
-	helpers.AssertEqualErrors(t, err, wantedErr)
+	tests.AssertEqualErrors(t, err, wantedErr)
 }
 
 func AssertIntValuesAndNilError(t testing.TB, err error, got, want int) {
-	helpers.AssertSameInt(t, got, want)
-	helpers.AssertEqualErrors(t, err, nil)
+	tests.AssertSameInt(t, got, want)
+	tests.AssertEqualErrors(t, err, nil)
 }
 
 func AssertFloatValuesAndNilError(t testing.TB, err error, got, want float64) {
-	helpers.AssertSameFloat(t, got, want)
-	helpers.AssertEqualErrors(t, err, nil)
+	tests.AssertSameFloat(t, got, want)
+	tests.AssertEqualErrors(t, err, nil)
 }

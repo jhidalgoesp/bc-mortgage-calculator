@@ -1,4 +1,4 @@
-module quoter
+module github.com/jhidalgoesp/bc-mortgage-calculator
 
 go 1.18
 

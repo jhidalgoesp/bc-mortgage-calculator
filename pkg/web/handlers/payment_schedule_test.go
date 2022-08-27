@@ -3,11 +3,11 @@ package handlers
 import (
 	"bytes"
 	"encoding/json"
+	"github.com/jhidalgoesp/bc-mortgage-calculator/pkg/mortgage"
+	"github.com/jhidalgoesp/bc-mortgage-calculator/pkg/tests"
+	"github.com/jhidalgoesp/bc-mortgage-calculator/pkg/validate"
 	"net/http"
 	"net/http/httptest"
-	"quoter/pkg/helpers"
-	"quoter/pkg/mortgage"
-	"quoter/pkg/validate"
 	"testing"
 )
 
@@ -23,42 +23,42 @@ func TestPaymentScheduleHandler(t *testing.T) {
 	t.Run("returns the correct values for a monthly schedule", func(t *testing.T) {
 		c.Schedule = mortgage.Monthly
 		jsonBody, _ := json.Marshal(&c)
-		request, _ := http.NewRequest(http.MethodGet, "/paymentSchedule", bytes.NewBuffer(jsonBody))
+		request, _ := http.NewRequest(http.MethodPost, "/paymentSchedule", bytes.NewBuffer(jsonBody))
 		response := httptest.NewRecorder()
 		PaymentScheduleHandler(response, request)
 		paymentSchedule := paymentScheduleResponse{}
 		json.NewDecoder(response.Body).Decode(&paymentSchedule)
 		want := 1832.51
-		helpers.AssertSameFloat(t, paymentSchedule.PaymentPerSchedule, want)
+		tests.AssertSameFloat(t, paymentSchedule.PaymentPerSchedule, want)
 	})
 
 	t.Run("returns the correct values for a biweekly schedule", func(t *testing.T) {
 		c.Schedule = mortgage.Biweekly
 		jsonBody, _ := json.Marshal(&c)
-		request, _ := http.NewRequest(http.MethodGet, "/paymentSchedule", bytes.NewBuffer(jsonBody))
+		request, _ := http.NewRequest(http.MethodPost, "/paymentSchedule", bytes.NewBuffer(jsonBody))
 		response := httptest.NewRecorder()
 		PaymentScheduleHandler(response, request)
 		paymentSchedule := paymentScheduleResponse{}
 		json.NewDecoder(response.Body).Decode(&paymentSchedule)
 		want := 845.05
-		helpers.AssertSameFloat(t, paymentSchedule.PaymentPerSchedule, want)
+		tests.AssertSameFloat(t, paymentSchedule.PaymentPerSchedule, want)
 	})
 
 	t.Run("returns the correct values for a accelerated biweekly schedule", func(t *testing.T) {
 		c.Schedule = mortgage.AcceleratedBiweekly
 		jsonBody, _ := json.Marshal(&c)
-		request, _ := http.NewRequest(http.MethodGet, "/paymentSchedule", bytes.NewBuffer(jsonBody))
+		request, _ := http.NewRequest(http.MethodPost, "/paymentSchedule", bytes.NewBuffer(jsonBody))
 		response := httptest.NewRecorder()
 		PaymentScheduleHandler(response, request)
 		paymentSchedule := paymentScheduleResponse{}
 		json.NewDecoder(response.Body).Decode(&paymentSchedule)
 		want := 916.255
-		helpers.AssertSameFloat(t, paymentSchedule.PaymentPerSchedule, want)
+		tests.AssertSameFloat(t, paymentSchedule.PaymentPerSchedule, want)
 	})
 
 	t.Run("returns not found if the path is not supported", func(t *testing.T) {
 		jsonBody, _ := json.Marshal(&c)
-		request, _ := http.NewRequest(http.MethodGet, "/test", bytes.NewBuffer(jsonBody))
+		request, _ := http.NewRequest(http.MethodPost, "/test", bytes.NewBuffer(jsonBody))
 		response := httptest.NewRecorder()
 		PaymentScheduleHandler(response, request)
 		err := errorResponse{}
@@ -71,7 +71,7 @@ func TestPaymentScheduleHandler(t *testing.T) {
 
 	t.Run("returns not found if the http method is not supported", func(t *testing.T) {
 		jsonBody, _ := json.Marshal(&c)
-		request, _ := http.NewRequest(http.MethodPost, "/paymentSchedule", bytes.NewBuffer(jsonBody))
+		request, _ := http.NewRequest(http.MethodGet, "/paymentSchedule", bytes.NewBuffer(jsonBody))
 		response := httptest.NewRecorder()
 		PaymentScheduleHandler(response, request)
 		err := errorResponse{}
@@ -83,7 +83,7 @@ func TestPaymentScheduleHandler(t *testing.T) {
 	})
 
 	t.Run("returns internal server error if request body is not present", func(t *testing.T) {
-		request, _ := http.NewRequest(http.MethodGet, "/paymentSchedule", http.NoBody)
+		request, _ := http.NewRequest(http.MethodPost, "/paymentSchedule", http.NoBody)
 		response := httptest.NewRecorder()
 		PaymentScheduleHandler(response, request)
 		err := errorResponse{}
@@ -97,7 +97,7 @@ func TestPaymentScheduleHandler(t *testing.T) {
 	t.Run("returns field errors if the body does not pass validations", func(t *testing.T) {
 		c.DownPayment = 0
 		jsonBody, _ := json.Marshal(&c)
-		request, _ := http.NewRequest(http.MethodGet, "/paymentSchedule", bytes.NewBuffer(jsonBody))
+		request, _ := http.NewRequest(http.MethodPost, "/paymentSchedule", bytes.NewBuffer(jsonBody))
 		response := httptest.NewRecorder()
 		PaymentScheduleHandler(response, request)
 		err := errorResponse{}
@@ -109,6 +109,16 @@ func TestPaymentScheduleHandler(t *testing.T) {
 		}
 		if want != errorField {
 			t.Errorf("got %v, want %v", err, want)
+		}
+	})
+
+	t.Run("when a preflight options request should respond ok status", func(t *testing.T) {
+		jsonBody, _ := json.Marshal(&c)
+		request, _ := http.NewRequest(http.MethodOptions, "/paymentSchedule", bytes.NewBuffer(jsonBody))
+		response := httptest.NewRecorder()
+		PaymentScheduleHandler(response, request)
+		if response.Code != http.StatusOK {
+			t.Errorf("got %v, want %v", response.Code, http.StatusOK)
 		}
 	})
 
@@ -131,7 +141,7 @@ func TestPaymentScheduleHandler(t *testing.T) {
 func AssertHandledErrors(tb testing.TB, c mortgage.Calculator, erro error) {
 	tb.Helper()
 	jsonBody, _ := json.Marshal(&c)
-	request, _ := http.NewRequest(http.MethodGet, "/paymentSchedule", bytes.NewBuffer(jsonBody))
+	request, _ := http.NewRequest(http.MethodPost, "/paymentSchedule", bytes.NewBuffer(jsonBody))
 	response := httptest.NewRecorder()
 	PaymentScheduleHandler(response, request)
 	err := errorResponse{}
