@@ -15,11 +15,13 @@ const (
 	maximumAmortizationPeriod = 30
 )
 
-// ErrPeriodOutOfRange variables for calculation operations
-var ErrPeriodOutOfRange = errors.New("amortization period out of range")
-var ErrPeriodNotAMultipleOfFive = errors.New("amortization period must be a 5 years multiple")
-var ErrDownPaymentNotLargeEnough = errors.New("down payment is lower than the minimum 5% of the property price")
-var errInvalidSchedule = errors.New("amortization schedule not supported")
+// errors for calculation operations
+var (
+	ErrPeriodOutOfRange          = errors.New("amortization period out of range")
+	ErrPeriodNotAMultipleOfFive  = errors.New("amortization period must be a 5 years multiple")
+	ErrDownPaymentNotLargeEnough = errors.New("down payment is lower than the minimum 5% of the property price")
+	errInvalidSchedule           = errors.New("amortization schedule not supported")
+)
 
 // Calculator holds the properties and exposes methods needed to perform mortgage calculations.
 type Calculator struct {
@@ -30,6 +32,7 @@ type Calculator struct {
 	Schedule           string  `json:"schedule" validate:"required"`
 }
 
+// PaymentSchedule returns the payment value according to the schedule.
 func (c Calculator) PaymentSchedule() (float64, error) {
 	err := validate.Check(c)
 	if err != nil {
